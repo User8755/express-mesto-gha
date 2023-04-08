@@ -18,8 +18,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/user", require("./routes/users"));
-app.use("/card", require("./routes/cards"));
+app.use("/users", require("./routes/users"));
+app.use("/cards", require("./routes/cards"));
 
 app.listen(PORT, () => {
   console.log("Сервер запущен");
