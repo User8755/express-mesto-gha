@@ -20,3 +20,24 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
+
+module.exports.likeCard = (req, res) => {
+  console.log(req.params)
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true }
+  )
+    .then((card) => res.send({ data: card }))
+    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+};
+
+module.exports.dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { new: true }
+  )
+    .then((card) => res.send({ data: card }))
+    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+};
