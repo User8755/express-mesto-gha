@@ -12,17 +12,18 @@ const cardSchema = new mongoose.Schema({
     required: true,
   },
   owner : {
-    type: String,
+    type: 'ObjectId',
     required: true
   },
   likes : {
     type: Array,
+    default: []
   },
   createdAt : {
-    type: Date
-    
+    type: Date,
+    default: Date.now
   }
-});
+}, { versionKey: false});
 
 // создаём модель и экспортируем её
 module.exports = mongoose.model("card", cardSchema);

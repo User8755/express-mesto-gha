@@ -1,10 +1,9 @@
-const router = require('express').Router();
-const Card = require('../models/card');
+const router = require("express").Router();
+const {getCards, delCardsById, createCard} = require("../controllers/cards")
 
-router.get('/', (req, res) => {
-  Card.find({})
-    .then(res => res.send({ data: res }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+router.get("/", getCards);
+router.delete("/:cardId", delCardsById);
+router.post("/", createCard);
+
 
 module.exports = router;

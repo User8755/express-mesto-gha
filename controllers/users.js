@@ -20,3 +20,29 @@ module.exports.createUsers = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
+
+module.exports.updateProfile = (req, res) => {
+  console.log(req.body);
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: req.body.name, about: req.body.about },
+    { new: true }
+  )
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+};
+
+module.exports.updateAvatar = (req, res) => {
+  console.log(req);
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar: req.body.avatar },
+    { new: true }
+  )
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+};
