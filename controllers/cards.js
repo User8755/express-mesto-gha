@@ -7,7 +7,7 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.delCardsById = (req, res) => {
-  Card.findByIdAndRemove(req.user._id)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       res.send({ data: card });
     })
