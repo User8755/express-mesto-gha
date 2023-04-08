@@ -7,7 +7,8 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  User.findById(req.user._id)
+  console.log(req.user);
+  User.findById({_id: req.user._id})
     .then((user) => {
       res.send({ data: user });
     })
@@ -16,13 +17,12 @@ module.exports.getUsersById = (req, res) => {
 
 module.exports.createUsers = (req, res) => {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar }, { new: true })
+  User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 module.exports.updateProfile = (req, res) => {
-  console.log(req.body);
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, about: req.body.about },
