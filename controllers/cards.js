@@ -30,7 +30,7 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(RES_OK).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: "Картачка не создана" });
+        res.status(BAD_REQUEST).send({ message: "Карточка не создана" });
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
     });
@@ -44,7 +44,7 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        res.status(NOT_FOUND).send({ message: "Карточка не найдена" });
         return;
       }
       res.send({ data: card });
@@ -66,7 +66,7 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
         return;
       }
       res.send({ data: card });
