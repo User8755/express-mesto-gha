@@ -66,14 +66,14 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена1" });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        res.status(NOT_FOUND).send({ message: "Картачка не найдена2" });
         return;
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
