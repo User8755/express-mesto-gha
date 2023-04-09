@@ -51,7 +51,7 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(ВAD_REQUEST).send({ message: "Картачка не найдена" });
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
         return;
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
