@@ -29,10 +29,10 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(RES_OK).send({ data: card }))
     .catch((err) => {
-      if (err) {
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: "Картачка не создана" });
       }
-      return res.status(ERR_DEFAULT).send({ message: "Произошла ошибка" });
+      res.status(DEFAULT).send({ message: "Произошла ошибка" });
     });
 };
 
@@ -51,7 +51,7 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        res.status(ВAD_REQUEST).send({ message: "Картачка не найдена" });
         return;
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
