@@ -18,7 +18,7 @@ module.exports.delCardsById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
     });
