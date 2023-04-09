@@ -7,8 +7,8 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  console.log(req.user);
-  User.findById({_id: req.user._id})
+  console.log(req.params);
+  User.findById({_id:req.params.userId})
     .then((user) => {
       res.send({ user });
     })
