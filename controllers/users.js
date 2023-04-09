@@ -10,7 +10,7 @@ module.exports.getUsersById = (req, res) => {
   console.log(req.user);
   User.findById({_id: req.user._id})
     .then((user) => {
-      res.send({ data: user });
+      res.send({ user });
     })
     .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
