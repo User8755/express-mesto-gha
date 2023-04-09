@@ -11,14 +11,14 @@ module.exports.delCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND).send({ message: "Произошла ошибка" });
+        res.status(BAD_REQUEST).send({ message: "Карточка не найдена" });
         return;
       }
       res.status(RES_OK).send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+        res.status(BAD_REQUEST).send({ message: "Карточка не найдена" });
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
     });
