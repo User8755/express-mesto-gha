@@ -15,8 +15,9 @@ module.exports.delCardsById = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
+  console.log(req.body)
   const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id }, {runValidators: true})
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
 };
