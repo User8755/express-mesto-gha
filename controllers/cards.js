@@ -10,24 +10,29 @@ module.exports.getCards = (req, res) => {
 module.exports.delCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if(!card) {
-        res.status(NOT_FOUND).send({ message: "Произошла ошибка" })
-        return
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: "Произошла ошибка" });
+        return;
       }
       res.status(RES_OK).send({ data: card });
     })
-    .catch((err) => res.status(DEFAULT).send({ message: "Произошла ошибка" }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+      }
+      res.status(DEFAULT).send({ message: "Произошла ошибка" });
+    });
 };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((card) =>  res.status(RES_OK).send({ data: card }))
+    .then((card) => res.status(RES_OK).send({ data: card }))
     .catch((err) => {
-      if(err) {
-        res.status(BAD_REQUEST).send({ message: "Картачка не создана" })
+      if (err) {
+        res.status(BAD_REQUEST).send({ message: "Картачка не создана" });
       }
-      return res.status(ERR_DEFAULT).send({ message: "Произошла ошибка" })
+      return res.status(ERR_DEFAULT).send({ message: "Произошла ошибка" });
     });
 };
 
@@ -38,17 +43,19 @@ module.exports.likeCard = (req, res) => {
     { new: true }
   )
     .then((card) => {
-      if(!card) {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" })
-        return
+      if (!card) {
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+        return;
       }
-      res.send({ data: card })})
+      res.send({ data: card });
+    })
     .catch((err) => {
-      if(err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" })
-        return
+      if (err.name === "CastError") {
+        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+        return;
       }
-      res.status(DEFAULT).send({ message: "Произошла ошибка" })});
+      res.status(DEFAULT).send({ message: "Произошла ошибка" });
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -57,16 +64,18 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-  .then((card) => {
-    if(!card) {
-      res.status(BAD_REQUEST).send({ message: "Картачка не найдена" })
-      return
-    }
-    res.send({ data: card })})
-    .catch((err) => {
-      if(err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" })
-        return
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        return;
       }
-      res.status(DEFAULT).send({ message: "Произошла ошибка" })});
+      res.send({ data: card });
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
+        return;
+      }
+      res.status(DEFAULT).send({ message: "Произошла ошибка" });
+    });
 };
