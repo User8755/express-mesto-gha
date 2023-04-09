@@ -8,7 +8,6 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  console.log(req.params);
   User.findById({ _id: req.params.userId })
     .then((user) => {
       if (!user) {
@@ -51,14 +50,14 @@ module.exports.updateProfile = (req, res) => {
   )
   .then((card) => {
     if (!card) {
-      res.status(NOT_FOUND).send({ message: "Пользователь не найдена" });
+      res.status(BAD_REQUEST).send({ message: "Пользователь не найдена" });
       return;
     }
     res.send({ data: card });
   })
   .catch((err) => {
-    if (err.name === "CastError") {
-      res.status(NOT_FOUND).send({ message: "Пользователь не найдена" });
+    if (err.name === 'ValidationError') {
+      res.status(BAD_REQUEST).send({ message: "Произошла ошибка, информация не обновлена" });
       return;
     }
     res.status(DEFAULT).send({ message: "Произошла ошибка" });
@@ -73,7 +72,7 @@ module.exports.updateAvatar = (req, res) => {
     { new: true, runValidators: true }
   )
     .then((user) => {
-      es.status(RES_OK).send({ data: user });
+      res.status(RES_OK).send({ data: user });
     })
     .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
