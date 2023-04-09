@@ -44,14 +44,14 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(BAD_REQUEST).send({ message: "Картачка не найдена" });
+        res.status(NOT_FOUND).send({ message: "Картачка не найдена" });
         return;
       }
       res.status(DEFAULT).send({ message: "Произошла ошибка" });
