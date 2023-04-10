@@ -7,7 +7,7 @@
     "start": "node ./app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
-    "lint": "npx eslint"
+    "lint": "npx eslint ."
     
   },
   "repository": {
@@ -15,7 +15,7 @@
     "url": "git+https://github.com/User8755/express-mesto-gha.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Evgeny Kalinin",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/User8755/express-mesto-gha/issues"
