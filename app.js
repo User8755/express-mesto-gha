@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { RES_OK } = require('./errors/errors');
+const { NOT_FOUND } = require('./errors/errors');
 
 const { PORT = 3000 } = process.env;
 
@@ -24,7 +24,7 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use((req, res) => {
-  res.status(RES_OK).send({ message: 'Такой страници не существует' });
+  res.status(NOT_FOUND).send({ message: 'Такой страници не существует' });
 });
 
 app.listen(PORT, () => {
