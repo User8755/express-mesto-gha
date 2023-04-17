@@ -1,3 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
   BAD_REQUEST, DEFAULT, NOT_FOUND,
@@ -31,13 +35,18 @@ module.exports.getUsersById = (req, res) => {
 
 module.exports.createUsers = (req, res) => {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+  bcrypt.hash(req.body.password, 4)
+    .then((hash) => User.create({
+      name, about, avatar, email: req.body.email, password: hash,
+    }))
+    .then((user) => {
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Пользователь не создана' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        res.status(DEFAULT).send({ message: 'Произошла ошибка, проверьте email и пароль' });
       }
     });
 };
@@ -79,5 +88,27 @@ module.exports.updateAvatar = (req, res) => {
       } else {
         res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
+      }
+      return bcrypt.compare(password, user.password);
+    })
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+      if (!user) {
+        res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
+      }
+      res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+      res.send({ message: 'Успешно' });
+    })
+    .catch(() => {
+      res.status(401).send({ message: 'Проверьте email и пароль' });
     });
 };
