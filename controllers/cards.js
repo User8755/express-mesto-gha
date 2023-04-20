@@ -10,21 +10,23 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.delCardsById = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
-      } else {
-        res.send({ data: card });
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Карточка не найдена' });
-      } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
-      }
-    });
+  Card.findById(req.params.cardId).then((item) => res.send(item));
+  // Card.findByIdAndRemove(req.params.cardId)
+  //   .then((card) => {
+  //     console.log(card);
+  //     if (!card) {
+  //       res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+  //     } else {
+  //       res.send({ data: card });
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     if (err.name === 'CastError') {
+  //       res.status(BAD_REQUEST).send({ message: 'Карточка не найдена' });
+  //     } else {
+  //       res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+  //     }
+  //   });
 };
 
 module.exports.createCard = (req, res) => {

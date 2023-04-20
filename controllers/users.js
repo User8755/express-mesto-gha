@@ -1,5 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // eslint-disable-next-line import/no-extraneous-dependencies
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -53,7 +55,7 @@ module.exports.createUsers = (req, res) => {
 
 module.exports.updateProfile = (req, res) => {
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user.userId,
     { name: req.body.name, about: req.body.about },
     { new: true, runValidators: true },
   )
@@ -75,7 +77,7 @@ module.exports.updateProfile = (req, res) => {
 
 module.exports.updateAvatar = (req, res) => {
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user.userId,
     { avatar: req.body.avatar },
     { new: true, runValidators: true },
   )
@@ -93,20 +95,23 @@ module.exports.updateAvatar = (req, res) => {
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email })
+
+  return User.findUserByCredentials(email, password)
+  // User.findOne({ email })
+    // .then((user) => {
+    //   if (!user) {
+    //     res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
+    //   }
+    //   return bcrypt.compare(password, user.password);
+    // })
     .then((user) => {
+      console.log(user);
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       if (!user) {
         res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
       }
-      return bcrypt.compare(password, user.password);
-    })
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
-      if (!user) {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
-      }
-      res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
-      res.send({ message: 'Успешно' });
+      // res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+      res.send(token);
     })
     .catch(() => {
       res.status(401).send({ message: 'Проверьте email и пароль' });
