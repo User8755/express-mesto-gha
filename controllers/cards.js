@@ -1,16 +1,34 @@
 const Card = require('../models/card');
-const {
-  BAD_REQUEST, DEFAULT, NOT_FOUND,
-} = require('../errors/errors');
+const DefaultError = require('../errors/default');
+const BadRequestError = require('../errors/badrequest');
+const NotFoundError = require('../errors/notfound');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(DEFAULT).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.delCardsById = (req, res) => {
-  Card.findById(req.params.cardId).then((item) => res.send(item));
+module.exports.delCardsById = (req, res, next) => {
+  Card.findById(req.params.cardId)
+    .then((reqCard) => {
+      const owner = req.user._id;
+      const ownerCard = reqCard.owner;
+      if (ownerCard.toString() === owner) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((card) => {
+            res.send({ data: card });
+          });
+      } else {
+        throw new BadRequestError('Это не ваша карточка');
+        // res.status(BAD_REQUEST).send({ message: 'Это не ваша карточка' });
+      }
+    })
+    .catch(() => {
+      throw new DefaultError('Произошла ошибка');
+      // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+    })
+    .catch(next);
   // Card.findByIdAndRemove(req.params.cardId)
   //   .then((card) => {
   //     console.log(card);
@@ -29,20 +47,23 @@ module.exports.delCardsById = (req, res) => {
   //   });
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Карточка не создана' });
+        throw new BadRequestError('Карточка не создана');
+        // res.status(BAD_REQUEST).send({ message: 'Карточка не создана' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        throw new DefaultError('Произошла ошибка');
+        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -50,21 +71,25 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
+        // res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
       } else {
         res.send({ data: card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Некорректный Id' });
+        throw new BadRequestError('Некорректный Id');
+        // res.status(BAD_REQUEST).send({ message: 'Некорректный Id' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        throw new DefaultError('Произошла ошибка');
+        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -72,16 +97,20 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+        throw new NotFoundError('Карточка не найдена');
+        // res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
       } else {
         res.send({ data: card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Некорректный Id' });
+        throw new BadRequestError('Некорректный Id');
+        // res.status(BAD_REQUEST).send({ message: 'Некорректный Id' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        throw new DefaultError('Произошла ошибка');
+        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
-    });
+    })
+    .catch(next);
 };

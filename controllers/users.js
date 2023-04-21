@@ -5,39 +5,45 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  BAD_REQUEST, DEFAULT, NOT_FOUND,
-} = require('../errors/errors');
+const DefaultError = require('../errors/default');
+const BadRequestError = require('../errors/badrequest');
+const ConflictError = require('../errors/conflict');
+const NotFoundError = require('../errors/notfound');
+const Unauthorized = require('../errors/unauthorized');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(DEFAULT).send({ message: 'Произошла ошибка' }));
+    .catch(() => { throw new DefaultError('Произошла ошибка'); })
+    .catch(next);
 };
 
-module.exports.getUsersById = (req, res) => {
-  User.findById({ _id: req.params.userId })
+module.exports.getUsersById = (req, res, next) => {
+  User.findById({ _id: req.user._id })
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по ID не найден' });
+        throw new NotFoundError('Пользователь по ID не найден');
       } else {
         res.send({ user });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({
-          message: 'Пользователь по ID не существует',
-        });
+        throw new BadRequestError('Пользователь по ID не существует');
+        // res.status(BAD_REQUEST).send({
+        //   message: 'Пользователь по ID не существует',
+        // });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        throw new DefaultError('Произошла ошибка');
+        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.createUsers = (req, res) => {
+module.exports.createUsers = (req, res, next) => {
   const { name, about, avatar } = req.body;
-  bcrypt.hash(req.body.password, 4)
+  bcrypt.hash(req.body.password, 4) // для тест пароль 4 символа
     .then((hash) => User.create({
       name, about, avatar, email: req.body.email, password: hash,
     }))
@@ -45,15 +51,18 @@ module.exports.createUsers = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Пользователь не создана' });
+      if (err.code === 11000) {
+        throw new ConflictError('Пользователь с таким email зарегистрирован');
+        // res.status(BAD_REQUEST).send({ message: 'Пользователь не создан' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка, проверьте email и пароль' });
+        throw new DefaultError('Произошла ошибка, проверьте email и пароль');
+        // res.status(DEFAULT).send({ message: 'Произошла ошибка, проверьте email и пароль' });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user.userId,
     { name: req.body.name, about: req.body.about },
@@ -61,21 +70,25 @@ module.exports.updateProfile = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найдена' });
+        throw new NotFoundError('Пользователь не найдена');
+        // res.status(NOT_FOUND).send({ message: 'Пользователь не найдена' });
       } else {
         res.send({ data: card });
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Произошла ошибка, информация не обновлена' });
+        throw new BadRequestError('Произошла ошибка, информация не обновлена');
+        // res.status(BAD_REQUEST).send({ message: 'Произошла ошибка, информация не обновлена' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        throw new DefaultError('Произошла ошибка');
+        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user.userId,
     { avatar: req.body.avatar },
@@ -86,34 +99,38 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Неверно заполнены поля' });
+        throw new BadRequestError('Неверно заполнены поля');
+        // res.status(BAD_REQUEST).send({ message: 'Неверно заполнены поля' });
       } else {
-        res.status(DEFAULT).send({ message: 'Произошла ошибка' });
+        throw new DefaultError('Произошла ошибка');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-  // User.findOne({ email })
-    // .then((user) => {
-    //   if (!user) {
-    //     res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
-    //   }
-    //   return bcrypt.compare(password, user.password);
-    // })
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      console.log(user);
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       if (!user) {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
+        throw new BadRequestError('Проверьте email и пароль');
+        // res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
       }
-      // res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
-      res.send(token);
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+          if (!matched) {
+            throw new BadRequestError('Проверьте email и пароль');
+            // res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
+          }
+          // не рекомендуют использовать куки в данном проекте, т.к. фронт расщитан на локалСторейдж
+          // res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+          res.send({ token });
+        });
     })
     .catch(() => {
-      res.status(401).send({ message: 'Проверьте email и пароль' });
-    });
+      throw new Unauthorized('Проверьте email и пароль');
+      // res.status(401).send({ message: 'Проверьте email и пароль' });
+    })
+    .catch(next);
 };
