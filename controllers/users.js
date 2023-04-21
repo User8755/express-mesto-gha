@@ -19,13 +19,22 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getUsersById = (req, res, next) => {
-  User.findById({ _id: req.user._id })
+  User.findById({ _id: req.params.userId })
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Пользователь по ID не найден');
-      } else {
-        res.send({ user });
+      try {
+        if (user) {
+          res.send(user);
+          return;
+        }
+        throw new NotFoundError('Карточка не найдена');
+      } catch (err) {
+        next(err);
       }
+      // if (!user) {
+      //   throw new NotFoundError('Пользователь по ID не найден');
+      // } else {
+      //   res.send({ user });
+      // }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -63,8 +72,9 @@ module.exports.createUsers = (req, res, next) => {
 };
 
 module.exports.updateProfile = (req, res, next) => {
+  console.log(req.user._id);
   User.findByIdAndUpdate(
-    req.user.userId,
+    req.user._id,
     { name: req.body.name, about: req.body.about },
     { new: true, runValidators: true },
   )
@@ -90,7 +100,7 @@ module.exports.updateProfile = (req, res, next) => {
 
 module.exports.updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
-    req.user.userId,
+    req.user._id,
     { avatar: req.body.avatar },
     { new: true, runValidators: true },
   )
@@ -128,8 +138,12 @@ module.exports.login = (req, res, next) => {
           res.send({ token });
         });
     })
-    .catch(() => {
-      throw new Unauthorized('Проверьте email и пароль');
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new Unauthorized('Проверьте email и пароль');
+      } else {
+        throw new BadRequestError('Проверьте email и пароль');
+      }
       // res.status(401).send({ message: 'Проверьте email и пароль' });
     })
     .catch(next);
