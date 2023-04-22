@@ -21,6 +21,8 @@ module.exports.getUsersById = (req, res, next) => {
     .then((user) => {
       if (user) {
         res.send(user);
+      } else {
+        next(new BadRequestError('Неверный Id'));
       }
     })
     .catch((err) => {
