@@ -19,14 +19,13 @@ module.exports.delCardsById = (req, res, next) => {
             res.send({ data: card });
           });
       } else {
-        const forbidden = new ForbiddenError('Это не ваша карточка');
-        next(forbidden);
+        next(new ForbiddenError('Это не ваша карточка'));
       }
     })
     // .catch(() => {
     //   throw new NotFoundError('Некорректный Id');
     // })
-    .catch(next(new NotFoundError('Некорректный Id')));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
