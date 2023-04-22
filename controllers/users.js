@@ -22,7 +22,7 @@ module.exports.getUsersById = (req, res, next) => {
       if (user) {
         res.send(user);
       } else {
-        next(new BadRequestError('Неверный Id'));
+        next(new NotFoundError('Неверный Id'));
       }
     })
     .catch((err) => {
