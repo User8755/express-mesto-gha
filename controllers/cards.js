@@ -1,5 +1,4 @@
 const Card = require('../models/card');
-// const DefaultError = require('../errors/default');
 const BadRequestError = require('../errors/badrequest');
 const NotFoundError = require('../errors/notfound');
 const ForbiddenError = require('../errors/forbidden');
@@ -22,9 +21,6 @@ module.exports.delCardsById = (req, res, next) => {
         next(new ForbiddenError('Это не ваша карточка'));
       }
     })
-    // .catch(() => {
-    //   throw new NotFoundError('Некорректный Id');
-    // })
     .catch((err) => {
       if (err.name === 'TypeError') {
         next(new NotFoundError('Некорректный Id'));
@@ -45,7 +41,6 @@ module.exports.createCard = (req, res, next) => {
         next(err);
       }
     });
-  // .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -68,7 +63,6 @@ module.exports.likeCard = (req, res, next) => {
         next(err);
       }
     });
-  // .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -91,5 +85,4 @@ module.exports.dislikeCard = (req, res, next) => {
         next(err);
       }
     });
-  // .catch(next);
 };
