@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,17 +18,23 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+      validate: {
+        validator: (v) => validator.isURL(v),
+        message: 'Не верный адрес',
+      },
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      validate: {
+        validator: (v) => validator.isEmail(v),
+        message: 'Не верный email',
+      },
     },
     password: {
-      // Почему-то возвращется поле с паролем при просто запросах
       type: String,
       required: true,
-      minlength: 4,
       select: false,
     },
   },
