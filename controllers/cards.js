@@ -63,10 +63,6 @@ module.exports.createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Карточка не создана');
-        // res.status(BAD_REQUEST).send({ message: 'Карточка не создана' });
-      } else {
-        throw new DefaultError('Произошла ошибка');
-        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
     })
     .catch(next);

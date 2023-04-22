@@ -165,7 +165,7 @@ module.exports.login = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new Unauthorized('Проверьте email и пароль');
       } else {
-        throw new BadRequestError('Проверьте email и пароль');
+        throw new Unauthorized('Проверьте email и пароль');
       }
       // res.status(401).send({ message: 'Проверьте email и пароль' });
     })
