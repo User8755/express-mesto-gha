@@ -62,12 +62,14 @@ module.exports.getUsersСurrent = (req, res, next) => {
 
 module.exports.createUsers = (req, res, next) => {
   const { name, about, avatar } = req.body;
-  bcrypt.hash(req.body.password, 4) // для тест пароль 4 символа
+  bcrypt.hash(req.body.password, 4) // для теста пароль 4 символа
     .then((hash) => User.create({
       name, about, avatar, email: req.body.email, password: hash,
     }))
     .then((user) => {
-      res.send({ data: user });
+      res.send({
+        name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+      });
     })
     .catch((err) => {
       if (err.code === 11000) {
