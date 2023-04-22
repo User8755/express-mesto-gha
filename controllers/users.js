@@ -42,9 +42,6 @@ module.exports.getUsersById = (req, res, next) => {
         // res.status(BAD_REQUEST).send({
         //   message: 'Пользователь по ID не существует',
         // });
-      } else {
-        throw new DefaultError('Произошла ошибка');
-        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
     })
     .catch(next);
@@ -66,8 +63,6 @@ module.exports.getUsersСurrent = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Пользователь по ID не существует');
-      } else {
-        throw new DefaultError('Произошла ошибка');
       }
     })
     .catch(next);

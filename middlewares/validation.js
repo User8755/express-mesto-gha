@@ -1,47 +1,48 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable import/no-extraneous-dependencies */
 const { celebrate, Joi } = require('celebrate');
 
-// аутенфикация
 module.exports.validationLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
-// авторизация
+
 module.exports.validationCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().pattern(/http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
-// обновление данных пользователя
+
 module.exports.validationUpdateProfile = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     about: Joi.string().min(2).max(30).required(),
   }),
 });
-// обновление аватара
+
 module.exports.validationUpdateAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required(),
+    avatar: Joi.string().required().pattern(/http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/),
   }),
 });
-// поиск по ID
+
 module.exports.validationUserId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required(),
+    userId: Joi.string().required().min(24).max(24)
+      .pattern(/[a-z][0-9]+/),
   }),
 });
 // создание карточки
 module.exports.validationCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required(),
+    link: Joi.string().required().pattern(/http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/),
   }),
 });
 // поиск карточки по Id

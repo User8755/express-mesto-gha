@@ -84,20 +84,12 @@ module.exports.likeCard = (req, res, next) => {
       } catch (err) {
         next(err);
       }
-      // if (!card) {
-      //   throw new NotFoundError('Карточка не найдена');
-      //   // res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
-      // } else {
-      //   res.send({ data: card });
-      // }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Некорректный Id');
-        // res.status(BAD_REQUEST).send({ message: 'Некорректный Id' });
       } else {
         throw new DefaultError('Произошла ошибка');
-        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
     })
     .catch(next);
@@ -119,14 +111,6 @@ module.exports.dislikeCard = (req, res, next) => {
       } catch (err) {
         next(err);
       }
-      // console.log(card);
-      // if (!card) {
-      //   console.log(card);
-      //   throw new NotFoundError('Карточка не найдена');
-      //   // res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
-      // } else {
-      //   res.send({ data: card });
-      // }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
