@@ -25,7 +25,13 @@ module.exports.delCardsById = (req, res, next) => {
     // .catch(() => {
     //   throw new NotFoundError('Некорректный Id');
     // })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'TypeError') {
+        next(new NotFoundError('Некорректный Id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.createCard = (req, res, next) => {
