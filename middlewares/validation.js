@@ -48,6 +48,7 @@ module.exports.validationCreateCard = celebrate({
 // поиск карточки по Id
 module.exports.validationCardById = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required(),
+    cardId: Joi.string().required().min(24).max(24)
+      .pattern(/[a-z][0-9]+/),
   }),
 });
