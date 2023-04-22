@@ -50,6 +50,29 @@ module.exports.getUsersById = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUsersСurrent = (req, res, next) => {
+  User.findById({ _id: req.user._id })
+    .then((user) => {
+      try {
+        if (user) {
+          res.send(user);
+          return;
+        }
+        throw new NotFoundError('Карточка не найдена');
+      } catch (err) {
+        next(err);
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Пользователь по ID не существует');
+      } else {
+        throw new DefaultError('Произошла ошибка');
+      }
+    })
+    .catch(next);
+};
+
 module.exports.createUsers = (req, res, next) => {
   const { name, about, avatar } = req.body;
   bcrypt.hash(req.body.password, 4) // для тест пароль 4 символа
