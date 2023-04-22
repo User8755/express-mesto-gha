@@ -30,18 +30,10 @@ module.exports.getUsersById = (req, res, next) => {
       } catch (err) {
         next(err);
       }
-      // if (!user) {
-      //   throw new NotFoundError('Пользователь по ID не найден');
-      // } else {
-      //   res.send({ user });
-      // }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Пользователь по ID не существует');
-        // res.status(BAD_REQUEST).send({
-        //   message: 'Пользователь по ID не существует',
-        // });
       }
     })
     .catch(next);
@@ -80,17 +72,14 @@ module.exports.createUsers = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         throw new ConflictError('Пользователь с таким email зарегистрирован');
-        // res.status(BAD_REQUEST).send({ message: 'Пользователь не создан' });
       } else {
         throw new BadRequestError('Произошла ошибка, проверьте email и пароль');
-        // res.status(DEFAULT).send({ message: 'Произошла ошибка, проверьте email и пароль' });
       }
     })
     .catch(next);
 };
 
 module.exports.updateProfile = (req, res, next) => {
-  console.log(req.user._id);
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, about: req.body.about },
@@ -99,7 +88,6 @@ module.exports.updateProfile = (req, res, next) => {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Пользователь не найдена');
-        // res.status(NOT_FOUND).send({ message: 'Пользователь не найдена' });
       } else {
         res.send({ data: card });
       }
@@ -107,10 +95,8 @@ module.exports.updateProfile = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Произошла ошибка, информация не обновлена');
-        // res.status(BAD_REQUEST).send({ message: 'Произошла ошибка, информация не обновлена' });
       } else {
         throw new DefaultError('Произошла ошибка');
-        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
     })
     .catch(next);
@@ -128,7 +114,6 @@ module.exports.updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Неверно заполнены поля');
-        // res.status(BAD_REQUEST).send({ message: 'Неверно заполнены поля' });
       } else {
         throw new DefaultError('Произошла ошибка');
       }
@@ -142,14 +127,12 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new BadRequestError('Проверьте email и пароль');
-        // res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
           if (!matched) {
             throw new BadRequestError('Проверьте email и пароль');
-            // res.status(BAD_REQUEST).send({ message: 'Проверьте email и пароль' });
           }
           // не рекомендуют использовать куки в данном проекте, т.к. фронт расщитан на локалСторейдж
           // res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
@@ -162,7 +145,6 @@ module.exports.login = (req, res, next) => {
       } else {
         throw new Unauthorized('Проверьте email и пароль');
       }
-      // res.status(401).send({ message: 'Проверьте email и пароль' });
     })
     .catch(next);
 };

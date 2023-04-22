@@ -13,27 +13,18 @@ module.exports.getCards = (req, res, next) => {
 module.exports.delCardsById = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((reqCard) => {
-      const owner = req.user._id;
-      const ownerCard = reqCard.owner;
-      if (ownerCard.toString() === owner) {
+      if (reqCard.owner.toString() === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .then((card) => {
             res.send({ data: card });
           });
       } else {
-        throw new ForbiddenError('Это не ваша карточка');
-        // res.status(BAD_REQUEST).send({ message: 'Это не ваша карточка' });
+        const forbidden = new ForbiddenError('Это не ваша карточка');
+        next(forbidden);
       }
     })
     .catch(() => {
       throw new NotFoundError('Некорректный Id');
-    //   console.log(err.name);
-    //   if (err.name === 'CastError') {
-    //     throw new NotFoundError('Некорректный Id');
-    //   }
-    //   if (err.name === 'TypeError') {
-    //     throw new NotFoundError('Карточка не найдена');
-    //   }
     })
     .catch(next);
 };
@@ -97,10 +88,8 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Некорректный Id');
-        // res.status(BAD_REQUEST).send({ message: 'Некорректный Id' });
       } else {
         throw new DefaultError('Произошла ошибка');
-        // res.status(DEFAULT).send({ message: 'Произошла ошибка' });
       }
     })
     .catch(next);

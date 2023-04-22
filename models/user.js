@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     password: {
+      // Почему-то возвращется поле с паролем при просто запросах
       type: String,
       required: true,
       minlength: 4,

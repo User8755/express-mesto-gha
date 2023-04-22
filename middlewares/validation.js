@@ -38,14 +38,14 @@ module.exports.validationUserId = celebrate({
       .pattern(/[a-z][0-9]+/),
   }),
 });
-// создание карточки
+
 module.exports.validationCreateCard = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
+    name: Joi.string().required().min(2).max(30),
     link: Joi.string().required().pattern(/http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/),
   }),
 });
-// поиск карточки по Id
+
 module.exports.validationCardById = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().required().min(24).max(24)
