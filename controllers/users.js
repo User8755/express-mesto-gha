@@ -87,7 +87,7 @@ module.exports.createUsers = (req, res, next) => {
         throw new ConflictError('Пользователь с таким email зарегистрирован');
         // res.status(BAD_REQUEST).send({ message: 'Пользователь не создан' });
       } else {
-        throw new DefaultError('Произошла ошибка, проверьте email и пароль');
+        throw new BadRequestError('Произошла ошибка, проверьте email и пароль');
         // res.status(DEFAULT).send({ message: 'Произошла ошибка, проверьте email и пароль' });
       }
     })
