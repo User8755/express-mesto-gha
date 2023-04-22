@@ -1,6 +1,5 @@
 const router = require('express').Router();
-// eslint-disable-next-line import/no-extraneous-dependencies
-const { celebrate, Joi } = require('celebrate');
+
 const {
   getCards,
   delCardsById,
@@ -9,15 +8,11 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 const auth = require('../middlewares/auth');
+const { validationCreateCard, validationCardById } = require('../middlewares/validation');
 
 router.get('/', auth, getCards);
-router.delete('/:cardId', auth, delCardsById);
-router.post('/', auth, celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().min(2).max(30),
-  }),
-}), createCard);
+router.delete('/:cardId', auth, validationCardById, delCardsById);
+router.post('/', auth, validationCreateCard, createCard);
 router.put('/:cardId/likes', auth, likeCard);
 router.delete('/:cardId/likes', auth, dislikeCard);
 
