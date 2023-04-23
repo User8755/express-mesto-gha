@@ -114,13 +114,13 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new Unauthorized('Проверьте email и пароль'));
+        throw new Unauthorized('Проверьте email и пароль');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
           if (!matched) {
-            next(new Unauthorized('Проверьте email и пароль'));
+            throw new Unauthorized('Проверьте email и пароль');
           }
           // не рекомендуют использовать куки в данном проекте, т.к. фронт расщитан на локалСторейдж
           // res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
@@ -128,10 +128,6 @@ module.exports.login = (req, res, next) => {
         });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new Unauthorized('Проверьте email и пароль'));
-      } else {
-        next(err);
-      }
+      next(err);
     });
 };

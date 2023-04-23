@@ -27,6 +27,7 @@ app.post('/signup', validationCreateUser, createUsers);
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
+app.use('*', auth);
 app.use((req, res, next) => {
   next(new NotFoundError('Такой страници не существует'));
 });

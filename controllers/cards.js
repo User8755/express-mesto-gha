@@ -12,6 +12,9 @@ module.exports.getCards = (req, res, next) => {
 module.exports.delCardsById = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((reqCard) => {
+      if (reqCard) {
+        throw new NotFoundError('Некорректный Id');
+      }
       if (reqCard.owner.toString() === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .then((card) => {
@@ -22,11 +25,7 @@ module.exports.delCardsById = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'TypeError') {
-        next(new NotFoundError('Некорректный Id'));
-      } else {
-        next(err);
-      }
+      next(err);
     });
 };
 
