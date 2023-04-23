@@ -12,7 +12,8 @@ module.exports.getCards = (req, res, next) => {
 module.exports.delCardsById = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((reqCard) => {
-      if (reqCard) {
+      if (!reqCard) {
+        console.log(typeof(reqCard))
         throw new NotFoundError('Некорректный Id');
       }
       if (reqCard.owner.toString() === req.user._id) {
