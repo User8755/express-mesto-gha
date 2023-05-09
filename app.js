@@ -11,7 +11,7 @@ const NotFoundError = require('./errors/notfound');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const urlList = ['http://mesto.user87.nomoredomains.monster/sign-up'];
+const urlList = ['http://mesto.user87.nomoredomains.monster'];
 
 const { PORT = 3000 } = process.env;
 
