@@ -32,7 +32,6 @@ app.use((req, res, next) => {
   const requestHeaders = req.headers['access-control-request-headers'];
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
   if (urlList.includes(origin)) {
-  // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
     res.header('Access-Control-Allow-Origin', origin);
   }
   res.header('Access-Control-Allow-Origin', '*');
@@ -42,6 +41,12 @@ app.use((req, res, next) => {
     return res.end();
   }
   next();
+});
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
 });
 
 app.post('/signin', validationLogin, login);
