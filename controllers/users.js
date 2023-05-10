@@ -9,7 +9,7 @@ const Unauthorized = require('../errors/unauthorized');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch(next);
 };
 
@@ -79,7 +79,7 @@ module.exports.updateProfile = (req, res, next) => {
       if (!card) {
         next(new NotFoundError('Пользователь не найдена'));
       } else {
-        res.send({ data: card });
+        res.send(card);
       }
     })
     .catch((err) => {
@@ -98,7 +98,7 @@ module.exports.updateAvatar = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .then((user) => {
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
