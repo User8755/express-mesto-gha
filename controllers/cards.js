@@ -4,7 +4,7 @@ const NotFoundError = require('../errors/notfound');
 const ForbiddenError = require('../errors/forbidden');
 
 module.exports.getCards = (req, res, next) => {
-  Card.find({})
+  Card.find({}).sort({ createdAt: -1 })
     .then((card) => res.send(card))
     .catch(next);
 };
@@ -13,13 +13,14 @@ module.exports.delCardsById = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((reqCard) => {
       if (!reqCard) {
-        throw new NotFoundError('Некорректный Id');
+        throw new NotFoundError('Карточка с данным Id не найдена');
       }
       if (reqCard.owner.toString() === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .then((card) => {
             res.send({ data: card });
-          });
+          })
+          .catch((err) => next(err));
       } else {
         next(new ForbiddenError('Это не ваша карточка'));
       }
@@ -35,7 +36,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Карточка не создана'));
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
       }

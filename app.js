@@ -40,7 +40,8 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Headers', requestHeaders);
     return res.end();
   }
-  next();
+
+  return next();
 });
 
 app.get('/crash-test', () => {
@@ -78,4 +79,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log('Сервер запущен');
+  console.log(process.env.NODE_ENV);
 });

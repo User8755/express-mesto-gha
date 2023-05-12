@@ -19,12 +19,12 @@ module.exports.getUsersById = (req, res, next) => {
       if (user) {
         res.send(user);
       } else {
-        next(new NotFoundError('Неверный Id'));
+        next(new NotFoundError('Пользователь с данным Id не найден'));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Пользователь по ID не существует'));
+        next(new BadRequestError('Неверный Id пользователя'));
       } else {
         next(err);
       }
@@ -36,11 +36,13 @@ module.exports.getUsersСurrent = (req, res, next) => {
     .then((user) => {
       if (user) {
         res.send(user);
+      } else {
+        next(new NotFoundError('Пользователь с данным Id не найден'));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Пользователь по ID не существует'));
+        next(new BadRequestError('Неверный Id пользователя'));
       } else {
         next(err);
       }
@@ -75,16 +77,16 @@ module.exports.updateProfile = (req, res, next) => {
     { name: req.body.name, about: req.body.about },
     { new: true, runValidators: true },
   )
-    .then((card) => {
-      if (!card) {
+    .then((user) => {
+      if (!user) {
         next(new NotFoundError('Пользователь не найдена'));
       } else {
-        res.send(card);
+        res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Произошла ошибка, информация не обновлена'));
+        next(new BadRequestError('Переданы некорректные данные, информация не обновлена'));
       } else {
         next(err);
       }
